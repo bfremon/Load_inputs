@@ -1,6 +1,11 @@
 rm = rm -fr
 py = /usr/bin/python3
 cp = /bin/cp
+sudo = /usr/bin/sudo  
+apt = $(sudo) /usr/bin/apt-get install
+
+pre:
+	$(apt) dh-python python3-stdeb
 
 deb: setup.py
 	$(py) setup.py --command-packages=stdeb.command \
