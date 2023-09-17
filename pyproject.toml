@@ -1,0 +1,12 @@
+[build-system]
+
+requires = ['setuptools']
+
+[project]
+
+name = 'lib_test'
+version = '0.0.4'
+dependencies = [
+	     'numpy',
+	     ]
+

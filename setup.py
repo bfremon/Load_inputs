@@ -3,12 +3,12 @@ from setuptools import setup
 
 setup(
     name = "lib_test",
-    version = "1.0",
+#    version = "1.0",
     author = "Benoit FREMON",
     author_email = "ben@in.volution.fr",
     description = "Demo of packaging a Python script as DEB",
     long_description = "Demo of packaging a Python script as DEB",
-    license = "BSD",
+    license = "GPL",
     url = "https://git.volution.fr:4444/pkg_template",
     packages=['lib_test'],
     entry_points = {
