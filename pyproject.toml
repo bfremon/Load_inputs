@@ -1,12 +1,14 @@
 [build-system]
 
 requires = ['setuptools']
+build-backend = "setuptools.build_meta"
 
 [project]
 
-name = 'lib_test'
-version = '0.0.4'
-dependencies = [
-	     'numpy',
-	     ]
+name = 'lib_utils'
+dynamic = ['dependencies', 'authors', 'classifiers', 'license', 'readme', 'description']
+version = '1.0'
 
+[tool.setuptools.dynamic]
+
+dependencies = { file = ['requirements.txt'] }
