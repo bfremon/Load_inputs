@@ -12,8 +12,10 @@ def load_data(data_path = None, ext = 'csv',
         data_path = os.path.join(os.getcwd(), 'data')
     else:
         data_path = os.path.join(data_path)
-    sys.stderr.write('Assuming %s as input path%s' %
-                    (data_path, os.linesep))
+    if ext == 'xls':
+        raise NotImplementedError('xls reading is not supported')
+    sys.stderr.write('%s: searching %s files%s' %
+                    (data_path, ext, os.linesep))
     if not os.path.exists(data_path):
         raise SyntaxError('Input path %s doesn\'t exist%s' %
                           (data_path, os.linesep))
@@ -57,6 +59,9 @@ def conc_input_files(input_files, sep, sheet_name):
         else:
             input_data = pd.read_excel(f_path,
                                        sheet_name = sheet_name)
+            if sheet_name is None and len(input_data) == 1:
+                unique_key = list(input_data)[0]
+                input_data = input_data[ unique_key ]
         input_data.insert(len(input_data.columns),
                           'orig',
                           [ f_path for i in range(len(input_data)) ])
