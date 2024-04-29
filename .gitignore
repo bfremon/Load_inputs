@@ -6,3 +6,4 @@ deb_dist/
 *.whl
 venv/
 build/
+Load_data/__pycache__
