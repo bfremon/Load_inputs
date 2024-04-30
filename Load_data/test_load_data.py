@@ -35,39 +35,84 @@ class test_Load_data(unittest.TestCase):
         self.assertRaises(OSError, load_data, self.data_path)
         os.chmod(self.data_path, 0o600)
 
+
+    def mk_input_files(self, ext = 'csv', n_files = 2):
+        self._mk_data_path()
+        input_datas = {}
+        input_paths = {}
+        for i in range(n_files):
+            input_datas[i] = pd.DataFrame({'a': [ i, ], 'b': [ i + 1, ]})
+        if ext == 'csv':       
+            for k in input_datas:
+                input_paths[k] = os.path.join(self.data_path, '%s.csv' % k)
+                input_datas[k].to_csv(input_paths[k], sep = ';')
+        else:
+            for k in input_datas:
+                input_paths[k] = os.path.join(self.data_path, '%s.xlsx' % k)
+                input_datas[k].to_excel(input_paths[k])
+        conc_data = pd.concat([ input_datas[k] for k in input_datas ])
+        return (conc_data, input_paths)
+    
         
     def test_csv(self):
-        self._mk_data_path()
-        data1 = pd.DataFrame({'a': [1,], 'b': [2,]})
-        data2 = pd.DataFrame({'a': [3,], 'b': [4,]})
-        data1.to_csv(os.path.join(self.data_path, '1.csv'), sep = ';')
-        data2.to_csv(os.path.join(self.data_path, '2.csv'), sep = ';')
-        sum_data = pd.concat([data1, data2])
+        conc_data = self.mk_input_files()[0]
         out_data = load_data(self.data_path)
         out_data.drop(columns = ['orig', 'Unnamed: 0'],
                       inplace = True)
         out_data = out_data.sort_values(by = 'a', axis = 'rows')
-        self.assertTrue(sum_data.equals(out_data))
+        self.assertTrue(conc_data.equals(out_data))
+
+
+    def test_multiple_csv(self):
+        conc_data = self.mk_input_files(n_files = 20)[0]
+        out_data = load_data(self.data_path)
+        out_data.drop(columns = ['orig', 'Unnamed: 0'],
+                      inplace = True)
+        out_data = out_data.sort_values(by = 'a', axis = 'rows')
+        self.assertTrue(conc_data.equals(out_data))
+
+    def _add_col(self, input_paths, input_idx, ext):
+        if ext == 'csv':
+            data_i = pd.read_csv(input_paths[input_idx], sep = ';')
+        else:
+            data_i = pd.read_excel(input_paths[input_idx])
+        data_i.insert(len(data_i.columns), 'c', [ 1 for i in range(len(data_i)) ])
+        if ext == 'csv':
+            data_i.to_csv(input_paths[input_idx], sep = ';')
+        else:
+            data_i.to_excel(input_paths[input_idx])
+
+            
+    def test_csv_n_cols_different(self):
+        conc_data, input_paths = self.mk_input_files()
+        self._add_col(input_paths, 1, 'csv')
+        self.assertRaises(ValueError, load_data, self.data_path)
 
         
-    def _1sheet_excel(self, ext):
-        self._mk_data_path()
-        data1 = pd.DataFrame({'a': [1,], 'b': [2,]})
-        data2 = pd.DataFrame({'a': [3,], 'b': [4,]})
-        data1.to_excel(os.path.join(self.data_path, '1.%s' % ext))
-        data2.to_excel(os.path.join(self.data_path, '2.%s' % ext))
-        sum_data = pd.concat([data1, data2])
+    def test_xls_n_cols_different(self):
+        ext = 'xlsx'
+        conc_data, input_paths = self.mk_input_files(ext = ext)
+        self._add_col(input_paths, 1, ext)
+        self.assertRaises(ValueError, load_data, self.data_path, ext = ext)
+
+        
+    def _1sheet_excel(self, ext, n_files):
+        conc_data = self.mk_input_files(ext = 'xlsx', n_files = n_files)[0]
         out_data = load_data(self.data_path, ext = ext)
         out_data.drop(columns = ['orig', 'Unnamed: 0'],
                       inplace = True)
         out_data = out_data.sort_values(by = 'a', axis = 'rows')
-        self.assertTrue(sum_data.equals(out_data))
+        self.assertTrue(conc_data.equals(out_data))
 
         
     def test_1sheet_excel(self):
-        self._1sheet_excel('xlsx')
+        self._1sheet_excel('xlsx', n_files = 2)
         self.assertRaises(NotImplementedError, load_data,
                           self.data_path, 'xls')
+
+        
+    def test_multiple_excel(self):
+        self._1sheet_excel('xlsx', n_files = 10)
         
         
     def tearDown(self):

@@ -14,8 +14,8 @@ def load_data(data_path = None, ext = 'csv',
         data_path = os.path.join(data_path)
     if ext == 'xls':
         raise NotImplementedError('xls reading is not supported')
-    sys.stderr.write('%s: searching %s files%s' %
-                    (data_path, ext, os.linesep))
+    sys.stderr.write('Searching %s files in %s%s' %
+                    ( ext, data_path, os.linesep ))
     if not os.path.exists(data_path):
         raise SyntaxError('Input path %s doesn\'t exist%s' %
                           (data_path, os.linesep))
@@ -52,6 +52,8 @@ def scan_by_ext(data_path, ext):
 def conc_input_files(input_files, sep, sheet_name):
     '''Concatenate input files'''
     ret = None
+    n_cols = -1
+    n_inputs = 0
     for f_path in input_files:
         ext = os.path.basename(f_path).split('.')[-1]
         if ext == 'csv':
@@ -62,6 +64,10 @@ def conc_input_files(input_files, sep, sheet_name):
             if sheet_name is None and len(input_data) == 1:
                 unique_key = list(input_data)[0]
                 input_data = input_data[ unique_key ]
+        if n_inputs == 0:
+            n_cols = len(input_data.columns)
+        elif len(input_data.columns) != n_cols:
+            raise ValueError('Wrong number of columns in %s' % f_path)
         input_data.insert(len(input_data.columns),
                           'orig',
                           [ f_path for i in range(len(input_data)) ])
@@ -69,4 +75,5 @@ def conc_input_files(input_files, sep, sheet_name):
             ret = input_data
         else:
             ret = pd.concat([ret, input_data])
+        n_inputs += 1
     return ret
