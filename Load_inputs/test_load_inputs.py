@@ -3,9 +3,9 @@
 import os
 import unittest
 import pandas as pd
-from Load_data import load_data
+from Load_inputs import load_inputs
 
-class test_Load_data(unittest.TestCase):
+class test_load_inputs(unittest.TestCase):
     test_path = os.path.join(os.getcwd(),
                                   'tmp_test')
     data_path = os.path.join(test_path,
@@ -26,13 +26,13 @@ class test_Load_data(unittest.TestCase):
     def test_data_path_exists_and_is_readable(self):
         if os.path.exists(self.data_path):
             os.rmdir(self.data_path)
-        self.assertRaises(SyntaxError, load_data)
+        self.assertRaises(SyntaxError, load_inputs)
         no_dir_path = os.path.join(self.test_path,
                                    'no_dir')
-        self.assertRaises(SyntaxError, load_data, no_dir_path)        
+        self.assertRaises(SyntaxError, load_inputs, no_dir_path)        
         self._mk_data_path()
         os.chmod(self.data_path, 0o200)
-        self.assertRaises(OSError, load_data, self.data_path)
+        self.assertRaises(OSError, load_inputs, self.data_path)
         os.chmod(self.data_path, 0o600)
 
 
@@ -56,7 +56,7 @@ class test_Load_data(unittest.TestCase):
         
     def test_csv(self):
         conc_data = self.mk_input_files()[0]
-        out_data = load_data(self.data_path)
+        out_data = load_inputs(self.data_path)
         out_data.drop(columns = ['orig', 'Unnamed: 0'],
                       inplace = True)
         out_data = out_data.sort_values(by = 'a', axis = 'rows')
@@ -65,7 +65,7 @@ class test_Load_data(unittest.TestCase):
 
     def test_multiple_csv(self):
         conc_data = self.mk_input_files(n_files = 20)[0]
-        out_data = load_data(self.data_path)
+        out_data = load_inputs(self.data_path)
         out_data.drop(columns = ['orig', 'Unnamed: 0'],
                       inplace = True)
         out_data = out_data.sort_values(by = 'a', axis = 'rows')
@@ -86,19 +86,19 @@ class test_Load_data(unittest.TestCase):
     def test_csv_n_cols_different(self):
         conc_data, input_paths = self.mk_input_files()
         self._add_col(input_paths, 1, 'csv')
-        self.assertRaises(ValueError, load_data, self.data_path)
+        self.assertRaises(ValueError, load_inputs, self.data_path)
 
         
     def test_xls_n_cols_different(self):
         ext = 'xlsx'
         conc_data, input_paths = self.mk_input_files(ext = ext)
         self._add_col(input_paths, 1, ext)
-        self.assertRaises(ValueError, load_data, self.data_path, ext = ext)
+        self.assertRaises(ValueError, load_inputs, self.data_path, ext = ext)
 
         
     def _1sheet_excel(self, ext, n_files):
         conc_data = self.mk_input_files(ext = 'xlsx', n_files = n_files)[0]
-        out_data = load_data(self.data_path, ext = ext)
+        out_data = load_inputs(self.data_path, ext = ext)
         out_data.drop(columns = ['orig', 'Unnamed: 0'],
                       inplace = True)
         out_data = out_data.sort_values(by = 'a', axis = 'rows')
@@ -107,7 +107,7 @@ class test_Load_data(unittest.TestCase):
         
     def test_1sheet_excel(self):
         self._1sheet_excel('xlsx', n_files = 2)
-        self.assertRaises(NotImplementedError, load_data,
+        self.assertRaises(NotImplementedError, load_inputs,
                           self.data_path, 'xls')
 
         

@@ -4,7 +4,7 @@ import os
 import sys
 import pandas as pd
 
-def load_data(data_path = None, ext = 'csv',
+def load_inputs(data_path = None, ext = 'csv',
          sheet_name = None,  sep = ';'):
     input_files = []
     ret = None
