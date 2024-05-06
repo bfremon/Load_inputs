@@ -25,7 +25,7 @@ whl: setup.py pyproject.toml
 	$(cp) dist/*.whl .
 
 test:
-	$(vpy) -m unittest discover
+	$(py) -m unittest discover
 
 .PHONY: clean
 
