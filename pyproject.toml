@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 
-name = 'lib_utils'
+name = 'Load_utils'
 dynamic = ['dependencies', 'authors', 'classifiers', 'license', 'readme', 'description']
 version = '1.0'
 
